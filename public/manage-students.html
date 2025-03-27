@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Manage Students</h1>
+    <form id="studentForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+
+        <button type="submit">Add Student</button>
+    </form>
+    <div id="message"></div>
+
+    <h2>Students List</h2>
+    <div id="students"></div>
+
+    <script>
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            const response = await fetch('http://localhost:5000/api/students', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email }),
+            });
+
+            const data = await response.json();
+            document.getElementById('message').innerText = data.message || data.error;
+            fetchStudents(); // Refresh student list
+        });
+
+        async function fetchStudents() {
+            const response = await fetch('http://localhost:5000/api/students');
+            const students = await response.json();
+            const studentsDiv = document.getElementById('students');
+            studentsDiv.innerHTML = '';
+
+            students.forEach(student => {
+                const studentElement = document.createElement('div');
+                studentElement.innerHTML = `<p>Name: ${student.name}, Email: ${student.email}</p>`;
+                studentsDiv.appendChild(studentElement);
+            });
+        }
+
+        fetchStudents();
+    </script>
+</body>
+</html>

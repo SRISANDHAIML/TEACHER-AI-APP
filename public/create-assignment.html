@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Assignment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-4">Create Assignment</h1>
+
+        <form id="assignmentForm" class="form-group">
+            <input type="text" id="title" class="form-control mb-3" placeholder="Assignment Title" required>
+
+            <textarea id="description" class="form-control mb-3" placeholder="Assignment Description" required></textarea>
+
+            <input type="text" id="difficulty" class="form-control mb-3" placeholder="Difficulty (easy, medium, hard)" required>
+
+            <button type="submit" class="btn btn-primary btn-block mt-3">Create Assignment</button>
+
+        </form>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        document.getElementById('assignmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const difficulty = document.getElementById('difficulty').value;
+            
+            // Retrieve teacher ID from localStorage after login
+            const teacherId = localStorage.getItem("teacherId"); 
+            if (!teacherId) {
+  
+                document.getElementById('message').innerText = "Error: Please log in first.";
+                return;
+            }
+
+            const response = await fetch('http://localhost:5000/api/assignments', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description, difficulty, createdBy: teacherId }),
+            });
+
+            const data = await response.json();
+            document.getElementById('message').innerText = data.message || data.error;
+        });
+    </script>
+</body>
+</html>
